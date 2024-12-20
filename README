@@ -1,0 +1,3 @@
+This is a simple python tkinter script for creating fonts using check boxes. 
+Allows you to click a grid of check boxes to represent a letter, create a set of letters and then export the whole thing as a python dict. 
+I wrote this to create icons and fonts for use with my ssd1306.py modules.
