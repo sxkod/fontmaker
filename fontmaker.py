@@ -7,12 +7,13 @@ cbtns={} # buttons that go in the current char set frame at the bottom, allows t
 fmxr=0
 fmxc=0
 
+
 if len(sys.argv)<4:
 	print("fontmake.py ROWS COLS RESOLUTION")
 	raise SystemExit
 
-def doit():
-	global resd,lbxmsg,fmx
+def addchar():
+	global resd,resds,lbxmsg,fmx
 	outd={}
 	tmpd=[]
 	tmpds=[]
@@ -25,9 +26,37 @@ def doit():
 	resd[entval.get()]=tmpd
 	resds[entval.get()]=tmpds
 	lbstr=entval.get()
-	tmpbtn=tkinter.Button(fmx,command=lambda:loadbtn(lbstr),text=entval.get())
-	puttoframe(tmpbtn)
-	cbtns[lbstr]=tmpbtn
+	tmpbtn=tkinter.Button(fmx,text=entval.get())
+	tmpbtn.bind("<Button-1>",loadbtn)
+	if not lbstr in cbtns:
+		puttoframe(tmpbtn)
+		cbtns[lbstr]=tmpbtn
+	print(resds)
+
+def loadfile():
+	global resd,resds,cbtns
+	resd={}
+	resds={}
+	cbtns={}
+	fname=saventval.get().strip()
+	if not len(fname):return
+	fx=open(fname).read().strip()
+	if not len(fx):return
+	dx=eval(fx)
+	if not type(dx)==type({}):return
+	for n in dx:
+		lbstr=str(n)
+		resd[n]=dx[n]
+		tmps=[]
+		for m in dx[n]:
+			tmps.append(format(m,'0'+str(resx)+'b')[::-1])
+		resds[n]=tmps
+		tbtn=tkinter.Button(fmx,text=n)
+		tbtn.bind("<Button-1>",loadbtn)
+		puttoframe(tbtn)
+		cbtns[n]=tbtn
+
+
 
 
 def puttoframe(widg):
@@ -39,9 +68,11 @@ def puttoframe(widg):
 		fmxc=0
 		
 	
-def loadbtn(param):
+def loadbtn(e):
 	global resds,btnsv
-	clrall()
+	param=e.widget.cget("text")
+	clrscr()
+	entval.set(param)
 	if param in resds:
 		for n in range(len(resds[param])):
 			for m in range(len(resds[param][n])):
@@ -62,16 +93,28 @@ def prt():
 def clrch(param):
 	global resd,cbtns,mx
 	if param in resd:
-		clrall()
+		clrscr()
 		resd.pop(param)
 	if param in cbtns:
 		cbtns[param].destroy()
-		
-def clrall():
+	entval.set("")
+	
+def clrscr():
 	global btnsv,lbxmsg
 	for n in btnsv:
 		for m in n:
 			m.set(0)
+
+def clrall():
+	global resd,resds,cbtns
+	clrscr()
+	resd={}
+	resds={}
+	cbtns={}
+	entval.set("")
+	saventval.set("")
+	for n in fmx.winfo_children():
+		n.destroy()
 		
 rows=int(sys.argv[1])
 cols=int(sys.argv[2])
@@ -99,21 +142,25 @@ for n in range(rows):
 
 ent=tkinter.Entry(mw,textvariable=entval,width=10)
 ent.grid(row=0,column=cols+1)
-dobtn=tkinter.Button(mw,text="Add Char",command=doit)
+dobtn=tkinter.Button(mw,text="Add Char",command=addchar)
 dobtn.grid(row=1,column=cols+1)
 dcbtn=tkinter.Button(mw,text="Del Char",command=lambda:clrch(entval.get()))
 dcbtn.grid(row=2,column=cols+1)
 
-clbtn=tkinter.Button(mw,text="Clear All",command=clrall)
+clbtn=tkinter.Button(mw,text="Clear Btn",command=clrscr)
 clbtn.grid(row=3,column=cols+1)
+cabtn=tkinter.Button(mw,text="Clear All",command=clrall)
+cabtn.grid(row=4,column=cols+1)
 prnbtn=tkinter.Button(mw,text="Print All",command=prt)
-prnbtn.grid(row=4,column=cols+1)
+prnbtn.grid(row=5,column=cols+1)
 savent=tkinter.Entry(mw,textvariable=saventval,width=10)
-savent.grid(row=5,column=cols+1)
+savent.grid(row=6,column=cols+1)
 savbtn=tkinter.Button(mw,text="Save File",command=savefile)
-savbtn.grid(row=6,column=cols+1)
+savbtn.grid(row=7,column=cols+1)
+lodbtn=tkinter.Button(mw,text="Load File",command=loadfile)
+lodbtn.grid(row=8,column=cols+1)
 qtbtn=tkinter.Button(mw,text="Exit App",command=mw.destroy)
-qtbtn.grid(row=7,column=cols+1)
+qtbtn.grid(row=9,column=cols+1)
 lbx.grid(row=rows+1,columnspan=cols+1)
 fmx.grid(row=rows+5,columnspan=cols+1)
 mw.mainloop()
