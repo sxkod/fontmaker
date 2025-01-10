@@ -1,6 +1,7 @@
 import tkinter
 import sys
 
+
 #TODO
 """
 Widget layout can be a lot cleaner than the adhoc!
@@ -9,7 +10,7 @@ File ops can use a file selection dialog
 
 """
 
-fmver="0.21"
+fmver="0.22"
 
 resd={} #[1001,1010]... int represntation of the character as a dict
 resds={} # ['100...','1001..' ...], COLS wide string representation of 1's and 0s for reloading the check boxes
@@ -170,6 +171,10 @@ def unset_grid(x):
 			m.set(0)
 
 
+def widgover(e):
+	if drawvar.get() or (e.state and e.state & 0x04 !=0):
+			e.widget.toggle()
+	
 rows=int(sys.argv[1])
 cols=int(sys.argv[2])
 resx=sys.argv[3]
@@ -180,6 +185,7 @@ mw.title("Font Maker "+fmver)
 entval=tkinter.StringVar()
 lbxmsg=tkinter.StringVar()
 saventval=tkinter.StringVar()
+drawvar=tkinter.IntVar()
 lbx=tkinter.Label(mw,textvariable=lbxmsg)
 fmx=tkinter.Frame(mw)
 ftx=tkinter.Frame(mw)
@@ -209,6 +215,7 @@ for n in range(rows):
 	for m in range(cols):
 		tvar=tkinter.IntVar()
 		tmp=tkinter.Checkbutton(mw,variable=tvar)
+		tmp.bind("<Leave>",widgover)
 		#tmp.grid(row=m,column=n+1)
 		tmp.grid(row=m+1,column=n+1)
 		bvrow.append(tvar)
@@ -252,6 +259,13 @@ lodbtn.grid(row=10,column=cols+1)
 
 qtbtn=tkinter.Button(bfrm,text="Exit App",command=mw.destroy)
 qtbtn.grid(row=11,column=cols+1)
+
+fdrw=tkinter.Frame(bfrm)
+fdrw.grid(row=12,column=cols+1)
+dlbl=tkinter.Label(fdrw,text="Draw")
+dlbl.grid(row=0,column=0)
+dbtn=tkinter.Checkbutton(fdrw,variable=drawvar)
+dbtn.grid(row=0,column=1)
 
 lbx.grid(row=rows+4,columnspan=cols+1)
 fmx.grid(row=rows+5,columnspan=cols+1)
